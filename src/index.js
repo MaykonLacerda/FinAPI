@@ -64,8 +64,6 @@ app.get("/statement", verifyIfExistsAccountCPF, (request, response) => {
 
 });
   
-app.listen(3333);
-
 app.post("/deposit", verifyIfExistsAccountCPF, (request, response) => {
     const { description, amount } = request.body;
 
@@ -118,10 +116,39 @@ app.get("/statement/date", verifyIfExistsAccountCPF, (request, response) => {
         new Date(dateFormat).toDateString()
     );
 
-    if(!statement.dateFormat) {
-        return response.status(400).json( { error: "Sem data "});
-    }
-
     return response.json(statement);
 
 });
+
+app.put("/account", verifyIfExistsAccountCPF, (request, response) => {
+    const { name } = request.body;
+    const { customer } = request;
+
+    customer.name = name;
+
+    return response.status(201).send();
+})
+
+app.get("/account", verifyIfExistsAccountCPF, (request, response) => {
+    const { customer } = request;
+
+    return response.json(customer);
+}) 
+
+app.delete("/account", verifyIfExistsAccountCPF, (request, response) => {
+    const { customer } = request;
+
+    customers.splice(customer, 1);
+
+    return response.status(200).json(customers);
+})
+
+app.get("/balance", verifyIfExistsAccountCPF, (request, response) => {
+    const { customer } = request;
+
+    const balance = getBalance(customer.statement);
+
+    return response.json(balance);
+})
+
+app.listen(3333);
